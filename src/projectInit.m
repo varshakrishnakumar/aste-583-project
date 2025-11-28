@@ -16,11 +16,13 @@ function [params,sc,st,X0,P0] = projectInit()
     params.Re = 6378; %km
     params.J2 = 0.0010826;
     params.we = 7.292116*10^-5; %rad/s
+    params.AU = 149597870.7; %AU in km
     
     %Sun
     params.mus = 132712000000; %km^3/s^2
 
     %SRP
+    params.psrp = (10^-3)*(4.54*10^-6)/(10^-6); %kN/km^2
     params.ksrp = 1; %SRP scale factor - UPDATE BASED ON MEASUREMENTS
     params.sigsrp = 1/3; %SRP a priori 3-sigma value
 
