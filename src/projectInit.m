@@ -40,6 +40,7 @@ function [params,sc,st,X0,P0] = projectInit()
 % Spacecraft Constants
     sc.m = 200; %kg
     sc.A = 1.5*10^-6; %km^2
+    sc.rho = 0.1; %reflectivity coefficient
 
 % Observation Station Constants
     % DSN stations are indices 1-3. Antarctica station is index 4.
