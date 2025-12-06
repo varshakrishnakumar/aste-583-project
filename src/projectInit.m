@@ -96,7 +96,7 @@ function [params,sc,st,X0,P0] = projectInit()
     end
 
     % k_SRP (unitless)
-    sig_k = params.sigsrp / 3;   % convert 3-sigma -> 1-sigma
+    sig_k = params.sigsrp;      % already 1-sigma
     P0(7,7) = sig_k^2;
 
     % Antarctica lat/lon (rad)
