@@ -7,12 +7,10 @@ function runPrelimEKF()
 %   - Antarctica station lat/lon estimates with 3-sigma
 %   - Range-rate bias estimate with 3-sigma
 
-    % ---------- Init project & time ----------
+    % ---------- Init t_project & time ----------
     [params, sc, st, X0, P0] = projectInit();
 
-    % You should already have a timeInit/initTime that gives detection ET.
-    % Here I'll assume it returns ET0, ET_LTM, ET_LCM:
-    [ET0, ~, ~] = timeInit();   % detection epoch ET in sec past J2000
+    [ET0, ~, ~] = initTime();   % detection epoch ET in sec past J2000
 
     % ---------- Load measurements (0-6 days) ----------
     meas = parseMeasurementData('ASTE583_Project_LTB_Measurements_0-6D_Truth.csv', ET0);
@@ -34,7 +32,7 @@ function runPrelimEKF()
     Q(7,7)   = q_k;
     Q(10,10) = q_bias;
 
-    % Measurement noise variance for range-rate (tune to your spec)
+    % Measurement noise variance for range-rate 
     sigma_rr = 1e-3;          % 1 m/s
     R_rr     = sigma_rr^2;    % scalar
 
@@ -51,21 +49,28 @@ function runPrelimEKF()
 
     % ---------- Main EKF loop ----------
     for k = 1:N
+
         t_meas   = tk(k);
         dt       = t_meas - t_prev;
-
+    
         % ----- Propagate state + STM from t_prev to t_meas -----
-        X_aug0 = [xhat_k; reshape(eye(10),100,1)];
-
-        odeFun = @(t,X) projectDynamics(t,X,params,sc);
-        [~, X_traj] = ode113(odeFun, [t_prev t_meas], X_aug0);
-        Xk_aug = X_traj(end,:).';
-
-        x_pred = Xk_aug(1:10);
-        Phi_k  = reshape(Xk_aug(11:end), 10, 10);
-
-        % Covariance propagation: P^- = Φ P Φ^T + Q*dt  (simple discretization)
-        P_pred = Phi_k * P_k * Phi_k.' + Q * max(dt,0);
+        if abs(dt) < 1e-9
+            x_pred = xhat_k;
+            Phi_k  = eye(10);
+            P_pred = P_k;   % no process noise yet
+        else
+            X_aug0 = [xhat_k; reshape(eye(10),100,1)];
+    
+            odeFun = @(t,X) projectDynamics(t,X,params,sc);
+            [~, X_traj] = ode113(odeFun, [t_prev t_meas], X_aug0);
+            Xk_aug = X_traj(end,:).';
+    
+            x_pred = Xk_aug(1:10);
+            Phi_k  = reshape(Xk_aug(11:end), 10, 10);
+    
+            % Covariance propagation
+            P_pred = Phi_k * P_k * Phi_k.' + Q * max(dt,0);
+        end
 
         % ----- Measurement prediction -----
         stationID = stk(k);
