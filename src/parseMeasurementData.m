@@ -12,7 +12,7 @@ function meas = parseMeasurementData(filename, t0_et)
 %       .range     - Nx1 range [km]   (NaN if not present in file)
 %       .rr        - Nx1 range-rate [km/s]
 
-    T = readtable(filename);
+    T = readtable(filename, 'VariableNamingRule','preserve');
 
     % Required fields
     t_rel    = T.("Time (s)");       % seconds since detection
