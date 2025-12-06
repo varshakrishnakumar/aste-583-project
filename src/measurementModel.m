@@ -1,129 +1,160 @@
-function [y, H] = measurementModel(T, X, stationID, params, st)
-% measurementModel
-%   Computes predicted range and range-rate measurements and
-%   the corresponding Jacobian H wrt the 10x1 state X.
+function [y, H] = measurementModel(t, X, stationID, params, st, measType)
+%MEASUREMENTMODEL Predict range / range-rate and measurement Jacobian.
 %
-% State X layout:
-%   1:3   r_sc      spacecraft position (Sun-centered EMO, km)
-%   4:6   v_sc      spacecraft velocity (Sun-centered EMO, km/s)
-%   7     k_SRP     SRP scale factor (unitless)
-%   8     lat_4     Antarctica station latitude [rad]
-%   9     lon_4     Antarctica station longitude [rad]
-%   10    bias_rr   range-rate bias [km/s]
+% State (uses first 10 elements of X; X may optionally include an STM):
+%   1:3   r_sc      [km]    Spacecraft position wrt Sun (ECLIPJ2000 / EMO)
+%   4:6   v_sc      [km/s]  Spacecraft velocity wrt Sun
+%   7     k_SRP     [-]     SRP scale factor (no direct measurement sensitivity)
+%   8     lat_4     [rad]   Antarctica station latitude
+%   9     lon_4     [rad]   Antarctica station longitude (positive-east)
+%   10    bias_rr   [km/s]  range-rate bias (only active first 6 days)
 %
 % Inputs:
-%   T         - ephemeris time (sec past J2000)
-%   X         - 10x1 state vector
-%   stationID - integer 1..4 (1-3 DSN, 4 Antarctica)
-%   params    - params struct from projectInit
-%   st        - station struct from projectInit (lat, long arrays)
+%   t         - ET seconds past J2000 (SPICE time)
+%   X         - state (10x1 or 110x1; first 10 used)
+%   stationID - 1..4
+%   params    - constants struct (needs mue, tday (optional), t0_et (optional))
+%   st        - station struct with .lat, .long for stations 1..3
+%   measType  - (optional) 'both' (default) | 'range' | 'rr'
 %
 % Outputs:
-%   y - 2x1 [range; rangeRate]
-%   H - 2x10 measurement Jacobian wrt X
+%   y - predicted measurement(s)
+%       'both'  -> [range; rr]  (2x1)
+%       'range' -> range        (1x1)
+%       'rr'    -> rr           (1x1)
+%   H - Jacobian wrt 10-state (rows match y)
 
-    % Unpack spacecraft state
-    r_sc    = X(1:3);    % km
-    v_sc    = X(4:6);    % km/s
-    k_SRP   = X(7);      %#ok<NASGU>  % no direct dependence in measurement
-    lat_4   = X(8);      % rad (Antarctica)
-    lon_4   = X(9);      % rad
-    bias_rr = X(10);     % km/s
+    if nargin < 6 || isempty(measType)
+        measType = 'both';
+    end
+    measType = lower(string(measType));
 
-    % Get Earth state in Sun-centered EMO (using SPICE; must have kernels loaded)
-    xEarth  = cspice_spkezr('Earth', T, 'ECLIPJ2000', 'NONE', 'Sun');
-    r_earth = xEarth(1:3);   % km
-    v_earth = xEarth(4:6);   % km/s
+    % Basic checks
+    if stationID < 1 || stationID > 4
+        error('measurementModel:BadStationID', 'stationID must be 1..4.');
+    end
 
-    % Select station latitude/longitude
+    X = X(:);
+    if numel(X) < 10
+        error('measurementModel:BadState', 'X must have at least 10 elements.');
+    end
+    x = X(1:10);
+
+    % Unpack state
+    r_sc    = x(1:3);
+    v_sc    = x(4:6);
+    lat_4   = x(8);
+    lon_4   = x(9);
+    bias_rr = x(10);
+
+    % Earth state wrt Sun in ECLIPJ2000 (EMO2000)
+    xEarth  = cspice_spkezr('EARTH', t, 'ECLIPJ2000', 'NONE', 'SUN');
+    r_earth = xEarth(1:3);
+    v_earth = xEarth(4:6);
+
+    % Select station lat/lon
     if stationID == 4
-        % Antarctica station uses estimated lat/lon from state
         lat_sta = lat_4;
         lon_sta = lon_4;
     else
-        % DSN stations: fixed, truth lat/lon from st
         lat_sta = st.lat(stationID);
         lon_sta = st.long(stationID);
     end
 
-    % Station position/velocity relative to Earth center in EMO frame
-    [r_loc, v_loc, dr_loc_dlat, dr_loc_dlon, dv_loc_dlat, dv_loc_dlon] = ...
-        stationInertialState(T, lat_sta, lon_sta, params);
+    % Get station state wrt Earth (and optionally partials wrt lat/lon)
+    if stationID == 4
+        [r_loc, v_loc, dr_dlat, dr_dlon, dv_dlat, dv_dlon] = ...
+            stationInertialState(t, lat_sta, lon_sta, params);
+    else
+        [r_loc, v_loc] = stationInertialState(t, lat_sta, lon_sta, params);
+        dr_dlat = []; dr_dlon = []; dv_dlat = []; dv_dlon = [];
+    end
 
-    % Station inertial state in Sun-centered EMO
-    r_sta = r_earth + r_loc;  % km
-    v_sta = v_earth + v_loc;  % km/s
+    % Station state wrt Sun
+    r_sta = r_earth + r_loc;
+    v_sta = v_earth + v_loc;
 
-    % Relative geometry
-    rho_vec = r_sc - r_sta;   % LOS vector (km)
-    rho     = norm(rho_vec);  % range (km)
-    u       = rho_vec / rho;  % LOS unit vector
+    % Line-of-sight geometry
+    rho_vec = r_sc - r_sta;
+    rho     = norm(rho_vec);
+    u       = rho_vec / rho;     % LOS unit vector
+    v_rel   = v_sc - v_sta;
 
-    v_rel   = v_sc - v_sta;   % relative velocity (km/s)
+    % Bias is only active during first 6 days after detection (if params supports it)
+    biasActive = true;
+    if isfield(params, 'bias_end_et')
+        biasActive = (t <= params.bias_end_et);
+    elseif isfield(params, 't0_et')
+        tday = 86400;
+        if isfield(params, 'tday'); tday = params.tday; end
+        biasActive = (t <= params.t0_et + 6*tday);
+    end
 
-    % Predicted measurements
-    range     = rho;
-    rangeRate = dot(v_rel, u) + bias_rr;  % km/s
+    if biasActive
+        rr_pred = dot(v_rel, u) + bias_rr;
+        drr_db  = 1;
+    else
+        rr_pred = dot(v_rel, u);
+        drr_db  = 0;
+    end
 
-    y = [range; rangeRate];
+    range_pred = rho;
 
-    % ------------------ Build H (2x10) ------------------ %
-    H = zeros(2,10);
+    % -------- Full measurement vector + Jacobian (2x10) -------- %
+    Hfull = zeros(2,10);
     I3 = eye(3);
 
-    % Range partials:
-    %   h1 = rho = ||rho_vec||
-    %   ∂h1/∂r_sc = u'
-    H(1,1:3) = u';       % wrt r_sc
-    % ∂h1/∂v_sc = 0
-    % no direct sensitivity to k_SRP, bias, etc. in measurement function
+    % Range partials
+    Hfull(1,1:3) = u.';     % d(rho)/d(r_sc)
 
-    % Range-rate partials:
-    %   h2 = v_rel · u + bias_rr
-    %   ∂h2/∂r_sc = (v_rel'/rho) * (I - u*u')
-    dhr2_dr = (v_rel'/rho) * (I3 - u*u');    % 1x3
-    H(2,1:3) = dhr2_dr;                      % wrt r_sc
+    % Range-rate partials
+    Hfull(2,4:6) = u.';     % d(rr)/d(v_sc)
+    Hfull(2,10)  = drr_db;  % d(rr)/d(bias_rr) (0 after day 6)
 
-    %   ∂h1/∂v_sc = 0,  ∂h2/∂v_sc = u'
-    H(2,4:6) = u';                           % wrt v_sc
+    % d(rr)/d(r_sc) = v_rel' * d(u)/d(r_sc)
+    % d(u)/d(r_sc) = (I - u u') / rho
+    Hfull(2,1:3) = (v_rel.' / rho) * (I3 - u*u.');
 
-    %   ∂h1/∂k_SRP = 0, ∂h2/∂k_SRP = 0 (only via dynamics)
-    %   so H(:,7) = 0 is fine.
-
-    %   ∂h2/∂bias_rr = 1
-    H(2,10) = 1;
-
-    % ------------------ Partials wrt Antarctica lat/lon ------------------ %
-    % Only apply for stationID == 4; for other stations those columns are zero.
+    % Station 4 lat/lon partials
     if stationID == 4
-        % rho_vec = r_sc - (r_earth + r_loc)
-        % ∂rho_vec/∂lat = -∂r_loc/∂lat,   ∂rho_vec/∂lon = -∂r_loc/∂lon
-        drho_dlat_vec = -dr_loc_dlat;
-        drho_dlon_vec = -dr_loc_dlon;
+        % rho_vec = r_sc - (r_earth + r_loc)  => d(rho_vec)/dp = -d(r_loc)/dp
+        drho_dlat = -dr_dlat;
+        drho_dlon = -dr_dlon;
 
-        % Range:
-        %   ∂rho/∂p = u' * ∂rho_vec/∂p
-        drange_dlat = u' * drho_dlat_vec;
-        drange_dlon = u' * drho_dlon_vec;
-
-        H(1,8) = drange_dlat;
-        H(1,9) = drange_dlon;
+        % Range: d(rho)/dp = u' * d(rho_vec)/dp
+        Hfull(1,8) = u.' * drho_dlat;
+        Hfull(1,9) = u.' * drho_dlon;
 
         % Range-rate:
-        %   v_rel = v_sc - (v_earth + v_loc)
-        %   ∂v_rel/∂p = -∂v_loc/∂p
-        dvrel_dlat = -dv_loc_dlat;
-        dvrel_dlon = -dv_loc_dlon;
+        % v_rel = v_sc - (v_earth + v_loc) => d(v_rel)/dp = -d(v_loc)/dp
+        dvrel_dlat = -dv_dlat;
+        dvrel_dlon = -dv_dlon;
 
-        %   ∂u/∂p = (I - u*u') * (∂rho_vec/∂p) / rho
-        du_dlat = (I3 - u*u') * drho_dlat_vec / rho;
-        du_dlon = (I3 - u*u') * drho_dlon_vec / rho;
+        % d(u)/dp = (I - u u') * d(rho_vec)/dp / rho
+        du_dlat = (I3 - u*u.') * drho_dlat / rho;
+        du_dlon = (I3 - u*u.') * drho_dlon / rho;
 
-        %   ∂h2/∂p = (∂v_rel/∂p)' * u + v_rel' * ∂u/∂p
-        drate_dlat = dvrel_dlat' * u + v_rel' * du_dlat;
-        drate_dlon = dvrel_dlon' * u + v_rel' * du_dlon;
+        % d(rr)/dp = d(v_rel)/dp · u + v_rel · d(u)/dp
+        Hfull(2,8) = dvrel_dlat.' * u + v_rel.' * du_dlat;
+        Hfull(2,9) = dvrel_dlon.' * u + v_rel.' * du_dlon;
+    end
 
-        H(2,8) = drate_dlat;
-        H(2,9) = drate_dlon;
+    % -------- Return requested measurement type -------- %
+    switch measType
+        case {"both","all"}
+            y = [range_pred; rr_pred];
+            H = Hfull;
+
+        case {"range","rho"}
+            y = range_pred;
+            H = Hfull(1,:);
+
+        case {"rr","rangerate","range-rate","rhodot"}
+            y = rr_pred;
+            H = Hfull(2,:);
+
+        otherwise
+            error('measurementModel:BadMeasType', ...
+                'measType must be ''both'', ''range'', or ''rr''.');
     end
 end

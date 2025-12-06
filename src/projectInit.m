@@ -30,7 +30,10 @@ function [params,sc,st,X0,P0] = projectInit()
     % Time
     params.tday  = 86400;                      % s
     params.tyear = 365.25*params.tday;         % s
-    params.GST0  = (10*60 + 43) * params.we;   % rad
+    % params.GST0  = (10*60 + 43) * params.we;   % rad
+    % Greenwich sidereal angle at epoch: 00:10:43 = 0 deg 10 arcmin 43 arcsec
+    params.GST0 = (10/60 + 43/3600) * (pi/180);  % rad
+
 
     % Rotation Matrix EME2000 to EMO2000 (equatorial -> ecliptic)
     params.eclipticTilt = (23 + 26/60 + 21.448/3600) * (pi/180); % rad
