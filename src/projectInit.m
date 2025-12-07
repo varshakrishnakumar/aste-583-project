@@ -26,13 +26,16 @@ function [params,sc,st,X0,P0] = projectInit()
     params.psrp   = (1e-3)*(4.54e-6)/(1e-6); % kN/km^2
     params.ksrp   = 1;          % SRP scale factor (state 7 initial guess)
     params.sigsrp = 1/3;        % SRP a priori 3-sigma value (unitless)
+    % params.psrp   = (1e-3)*(4.54e-6)/(1e-6); % kN/km^2 at 1 AU
+    % params.ksrp   = 1.0;    % nominal SRP scale factor
+    % params.sigsrp = 0.2;    % 1-sigma prior on k_SRP (20%)
 
     % Time
     params.tday  = 86400;                      % s
     params.tyear = 365.25*params.tday;         % s
-    % params.GST0  = (10*60 + 43) * params.we;   % rad
     % Greenwich sidereal angle at epoch: 00:10:43 = 0 deg 10 arcmin 43 arcsec
     params.GST0 = (10/60 + 43/3600) * (pi/180);  % rad
+    
 
 
     % Rotation Matrix EME2000 to EMO2000 (equatorial -> ecliptic)
@@ -101,6 +104,7 @@ function [params,sc,st,X0,P0] = projectInit()
     % k_SRP (unitless)
     sig_k = params.sigsrp;      % already 1-sigma
     P0(7,7) = sig_k^2;
+    % P0(7,7) = params.sigsrp^2;
 
     % Antarctica lat/lon (rad)
     sig_lat4 = (5*pi/180) / 3;   % 5 deg 3-sigma -> 1-sigma (example)

@@ -90,16 +90,17 @@ function out = runPrelimEKF(outDir, span)
     sigma_rr_ant  = 1e-6;   % km/s
 
     % Optional scaling knobs (if residuals are “too big”)
-    Rscale_rho_dsn = 1;
-    Rscale_rho_ant = 1;
-    Rscale_rr_dsn  = 1;
-    Rscale_rr_ant  = 1;
+    Rscale_rr_dsn  = 5;
+    Rscale_rr_ant  = 10;
+    Rscale_rho_dsn = 5;
+    Rscale_rho_ant = 5;
+
 
     % ---------- Process noise ----------
     % White acceleration noise (km^2/s^3). Tune as needed.
     q_acc_nom   = 1e-16;
-    q_acc_outg  = 1e-15;    % first 2 days
-    outgas_window = 2*86400;
+    % q_acc_outg  = 1e-15;    % first 2 days
+    % outgas_window = 2*86400;
 
     % Random walk on parameters (often 0 for these)
     q_k_rw    = 0;
@@ -146,12 +147,12 @@ function out = runPrelimEKF(outDir, span)
             Phi_k  = reshape(Xk_aug(11:end), 10, 10);
 
             % Process noise for this step
-            t_since_det = t_prev - ET0;
-            if t_since_det < outgas_window
-                q_acc = q_acc_outg;
-            else
-                q_acc = q_acc_nom;
-            end
+            % t_since_det = t_prev - ET0;
+            % if t_since_det < outgas_window
+            %     q_acc = q_acc_outg;
+            % else
+            q_acc = q_acc_nom;
+            % end
             Qd = makeQd(dt, q_acc, q_k_rw, q_bias_rw);
 
             P_pred = Phi_k * P_k * Phi_k.' + Qd;
@@ -397,7 +398,15 @@ function out = runPrelimEKF(outDir, span)
     plotCovEllipse(mu, Pxy, 3);
 
     % ---------- Save figures ----------
-    saveAllFigures(outDir, "EKF_" + span);
+    % saveAllFigures(outDir, "EKF_" + span);
+    % 
+    % try
+    %     print(f, fullfile(outDir, base), '-dpng', '-r300');
+    %     print(f, fullfile(outDir, base), '-dpdf', '-r300');
+    % catch ME
+    %     warning('Failed to save figure %d: %s', f.Number, ME.message);
+    % end
+
 
     % ---------- Return useful outputs ----------
     out.span     = span;
