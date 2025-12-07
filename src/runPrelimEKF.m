@@ -397,7 +397,7 @@ function out = runPrelimEKF(outDir, span)
     plotCovEllipse(mu, Pxy, 3);
 
     % ---------- Save figures ----------
-    saveAllFigures(outDir, "EKF_" + span);
+    %saveAllFigures(outDir, "EKF_" + span);
 
     % ---------- Return useful outputs ----------
     out.span     = span;
