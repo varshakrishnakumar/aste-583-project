@@ -7,8 +7,8 @@
 
 /* Table of constant values */
 
-static integer c_b8 = 5000002;
-static integer c_b22 = 10000000;
+static integer c_b8 = 16000002;
+static integer c_b22 = 32000000;
 static integer c__1024 = 1024;
 static integer c__2 = 2;
 static integer c__3 = 3;
@@ -752,7 +752,7 @@ static integer c__3 = 3;
 
 /*        Check the routine can handle the vertices. */
 
-	if (*nv > 5000002) {
+	if (*nv > 16000002) {
 	    setmsg_("Number of vertices # exceeds limit #.", (ftnlen)37);
 	    errint_("#", nv, (ftnlen)1);
 	    errint_("#", &c_b8, (ftnlen)1);
@@ -803,7 +803,7 @@ static integer c__3 = 3;
 /*        Check we can process 'NP' plates. */
 
 	*np = ari[0];
-	if (*np > 10000000) {
+	if (*np > 32000000) {
 	    setmsg_("Number of plates # exceeds limit #.", (ftnlen)35);
 	    errint_("#", np, (ftnlen)1);
 	    errint_("#", &c_b22, (ftnlen)1);
@@ -875,7 +875,7 @@ static integer c__3 = 3;
 
 /*        Check the routine can handle the vertices. */
 
-	if (*nv > 5000002) {
+	if (*nv > 16000002) {
 	    setmsg_("Number of vertices # exceeds limit #.", (ftnlen)37);
 	    errint_("#", nv, (ftnlen)1);
 	    errint_("#", &c_b8, (ftnlen)1);
@@ -944,7 +944,7 @@ static integer c__3 = 3;
 
 /*        Check we can process 'NP' plates. */
 
-	if (*np > 10000000) {
+	if (*np > 32000000) {
 	    setmsg_("Number of plates # exceeds limit #.", (ftnlen)35);
 	    errint_("#", np, (ftnlen)1);
 	    errint_("#", &c_b22, (ftnlen)1);
@@ -1234,7 +1234,7 @@ static integer c__3 = 3;
 /*                 the output plate files will be useless. */
 
 		    ++(*nv);
-		    if (*nv > 5000002) {
+		    if (*nv > 16000002) {
 			setmsg_("Number of vertices # exceeds limit #.", (
 				ftnlen)37);
 			errint_("#", nv, (ftnlen)1);
@@ -1269,7 +1269,7 @@ static integer c__3 = 3;
 /*                 the output plate files will be useless. */
 
 		    ++(*np);
-		    if (*np > 10000000) {
+		    if (*np > 32000000) {
 			setmsg_("Number of plates # exceeds limit #.", (
 				ftnlen)35);
 			errint_("#", np, (ftnlen)1);
@@ -1352,7 +1352,7 @@ static integer c__3 = 3;
 	    chkout_("RDFFPL", (ftnlen)6);
 	    return 0;
 	}
-	if (*nv > 5000002) {
+	if (*nv > 16000002) {
 	    setmsg_("Number of vertices # exceeds limit #.", (ftnlen)37);
 	    errint_("#", nv, (ftnlen)1);
 	    errint_("#", &c_b8, (ftnlen)1);
@@ -1360,7 +1360,7 @@ static integer c__3 = 3;
 	    chkout_("RDFFPL", (ftnlen)6);
 	    return 0;
 	}
-	if (*np > 10000000) {
+	if (*np > 32000000) {
 	    setmsg_("Number of plates # exceeds limit #.", (ftnlen)35);
 	    errint_("#", np, (ftnlen)1);
 	    errint_("#", &c_b22, (ftnlen)1);

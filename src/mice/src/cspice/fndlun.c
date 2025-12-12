@@ -23,7 +23,7 @@
 
     /* Local variables */
     static integer i__;
-    static logical resvd[99], opened;
+    static logical resvd[63], opened;
     static integer iostat;
 
 /* $ Abstract */
@@ -532,13 +532,13 @@
 /*     Initialize RESVD if it hasn't already been done. */
 
     if (first) {
-	for (i__ = 1; i__ <= 99; ++i__) {
-	    resvd[(i__1 = i__ - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+	for (i__ = 1; i__ <= 63; ++i__) {
+	    resvd[(i__1 = i__ - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		    i__1, "fndlun_", (ftnlen)547)] = FALSE_;
 	}
 	for (i__ = 1; i__ <= 3; ++i__) {
 	    resvd[(i__2 = resnum[(i__1 = i__ - 1) < 3 && 0 <= i__1 ? i__1 : 
-		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)551)] - 1) < 99 
+		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)551)] - 1) < 63 
 		    && 0 <= i__2 ? i__2 : s_rnge("resvd", i__2, "fndlun_", (
 		    ftnlen)551)] = TRUE_;
 	}
@@ -549,8 +549,8 @@
 /*     Cycle through the available units. Skip reserved units, */
 /*     INQUIRE about others. */
 
-    for (i__ = last + 1; i__ <= 99; ++i__) {
-	if (resvd[(i__1 = i__ - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+    for (i__ = last + 1; i__ <= 63; ++i__) {
+	if (resvd[(i__1 = i__ - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		i__1, "fndlun_", (ftnlen)565)]) {
 	    opened = TRUE_;
 	} else {
@@ -590,7 +590,7 @@
 
     i__1 = last;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	if (resvd[(i__2 = i__ - 1) < 99 && 0 <= i__2 ? i__2 : s_rnge("resvd", 
+	if (resvd[(i__2 = i__ - 1) < 63 && 0 <= i__2 ? i__2 : s_rnge("resvd", 
 		i__2, "fndlun_", (ftnlen)592)]) {
 	    opened = TRUE_;
 	} else {
@@ -844,13 +844,13 @@ L_reslun:
 /*     Initialize RESVD if it hasn't already been done. */
 
     if (first) {
-	for (i__ = 1; i__ <= 99; ++i__) {
-	    resvd[(i__1 = i__ - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+	for (i__ = 1; i__ <= 63; ++i__) {
+	    resvd[(i__1 = i__ - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		    i__1, "fndlun_", (ftnlen)848)] = FALSE_;
 	}
 	for (i__ = 1; i__ <= 3; ++i__) {
 	    resvd[(i__2 = resnum[(i__1 = i__ - 1) < 3 && 0 <= i__1 ? i__1 : 
-		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)852)] - 1) < 99 
+		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)852)] - 1) < 63 
 		    && 0 <= i__2 ? i__2 : s_rnge("resvd", i__2, "fndlun_", (
 		    ftnlen)852)] = TRUE_;
 	}
@@ -860,8 +860,8 @@ L_reslun:
 /*     If UNIT is in the proper range, set the corresponding flag */
 /*     to TRUE. */
 
-    if (*unit >= 1 && *unit <= 99) {
-	resvd[(i__1 = *unit - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+    if (*unit >= 1 && *unit <= 63) {
+	resvd[(i__1 = *unit - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		i__1, "fndlun_", (ftnlen)864)] = TRUE_;
     }
     return 0;
@@ -1086,14 +1086,14 @@ L_frelun:
 /*     Initialize RESVD if it hasn't already been done. */
 
     if (first) {
-	for (i__ = 1; i__ <= 99; ++i__) {
-	    resvd[(i__1 = i__ - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+	for (i__ = 1; i__ <= 63; ++i__) {
+	    resvd[(i__1 = i__ - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		    i__1, "fndlun_", (ftnlen)1102)] = FALSE_;
 	}
 	for (i__ = 1; i__ <= 3; ++i__) {
 	    resvd[(i__2 = resnum[(i__1 = i__ - 1) < 3 && 0 <= i__1 ? i__1 : 
 		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)1106)] - 1) < 
-		    99 && 0 <= i__2 ? i__2 : s_rnge("resvd", i__2, "fndlun_", 
+		    63 && 0 <= i__2 ? i__2 : s_rnge("resvd", i__2, "fndlun_", 
 		    (ftnlen)1106)] = TRUE_;
 	}
 	first = FALSE_;
@@ -1102,14 +1102,14 @@ L_frelun:
 /*     If UNIT is in the proper range and it has not been reserved by */
 /*     default, set the corresponding flag to FALSE. */
 
-    if (*unit >= 1 && *unit <= 99) {
+    if (*unit >= 1 && *unit <= 63) {
 	for (i__ = 1; i__ <= 3; ++i__) {
 	    if (*unit == resnum[(i__1 = i__ - 1) < 3 && 0 <= i__1 ? i__1 : 
 		    s_rnge("resnum", i__1, "fndlun_", (ftnlen)1120)]) {
 		return 0;
 	    }
 	}
-	resvd[(i__1 = *unit - 1) < 99 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
+	resvd[(i__1 = *unit - 1) < 63 && 0 <= i__1 ? i__1 : s_rnge("resvd", 
 		i__1, "fndlun_", (ftnlen)1125)] = FALSE_;
     }
     return 0;

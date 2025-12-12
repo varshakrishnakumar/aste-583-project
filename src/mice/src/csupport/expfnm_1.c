@@ -13,18 +13,32 @@ static integer c__1 = 1;
 /* Subroutine */ int expfnm_1__(char *infil, char *outfil, ftnlen infil_len, 
 	ftnlen outfil_len)
 {
+    /* System generated locals */
+    integer i__1;
+
     /* Builtin functions */
     integer s_cmp(char *, char *, ftnlen, ftnlen);
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    integer i_len(char *, ftnlen);
 
     /* Local variables */
+    integer need, keep;
+    char word[255];
     integer blank;
     extern /* Subroutine */ int chkin_(char *, ftnlen), errch_(char *, char *,
 	     ftnlen, ftnlen);
+    integer inlen, slash;
     extern integer rtrim_(char *, ftnlen);
+    integer dirlen;
+    extern /* Subroutine */ int getenv_(char *, char *, ftnlen, ftnlen);
+    integer wrdlen;
     extern /* Subroutine */ int sigerr_(char *, ftnlen), chkout_(char *, 
-	    ftnlen), setmsg_(char *, ftnlen);
+	    ftnlen), repsub_(char *, integer *, integer *, char *, char *, 
+	    ftnlen, ftnlen, ftnlen), setmsg_(char *, ftnlen), errint_(char *, 
+	    integer *, ftnlen);
+    integer outlen;
     extern logical return_(void);
+    char dir[255];
     extern integer pos_(char *, char *, integer *, ftnlen, ftnlen);
 
 /* $ Abstract */
@@ -306,6 +320,9 @@ static integer c__1 = 1;
 /*     SPICELIB functions */
 
 
+/*     Parameters */
+
+
 /*     Local variables */
 
 
@@ -340,10 +357,66 @@ static integer c__1 = 1;
 	return 0;
     }
 
-/*     Because the operating system takes care of any necessary filename */
-/*     translations, just return the input filename. */
+/*     Look for a slash in the filename. */
 
-    s_copy(outfil, infil, outfil_len, infil_len);
+    slash = pos_(infil, "/", &c__1, infil_len, (ftnlen)1);
+
+/*     If we found a slash in a position other than the first */
+/*     character position, we want to examine the word that */
+/*     comes before it just in case it is an environment */
+/*     variable. */
+
+    if (slash > 1) {
+	s_copy(word, infil, (ftnlen)255, slash - 1);
+	getenv_(word, dir, (ftnlen)255, (ftnlen)255);
+
+/*        If the word was an environment variable, then construct */
+/*        the expanded filename. If it wasn't, just return the original */
+/*        input filename. */
+
+	if (s_cmp(dir, " ", (ftnlen)255, (ftnlen)1) != 0) {
+	    s_copy(outfil, infil, outfil_len, infil_len);
+	    inlen = rtrim_(infil, infil_len);
+	    wrdlen = rtrim_(word, (ftnlen)255);
+	    dirlen = rtrim_(dir, (ftnlen)255);
+	    outlen = i_len(outfil, outfil_len);
+	    keep = inlen - wrdlen;
+	    need = keep + dirlen;
+
+/*           If the output filename length is not long enough for */
+/*           the substitution, signal an error. Otherwise, substitute */
+/*           in the new value. */
+
+	    if (need > outlen) {
+		setmsg_("The expanded filename for the input filename '#' ex"
+			"ceeded the length of the output filename. The expand"
+			"ed name was # characters too long.", (ftnlen)137);
+		errch_("#", infil, (ftnlen)1, infil_len);
+		i__1 = need - outlen;
+		errint_("#", &i__1, (ftnlen)1);
+		sigerr_("SPICE(STRINGTOOSMALL)", (ftnlen)21);
+		chkout_("EXPFNM_1", (ftnlen)8);
+		return 0;
+	    } else {
+		i__1 = slash - 1;
+		repsub_(infil, &c__1, &i__1, dir, outfil, infil_len, rtrim_(
+			dir, (ftnlen)255), outfil_len);
+	    }
+	} else {
+	    s_copy(outfil, infil, outfil_len, infil_len);
+	}
+    } else {
+
+/*        No slashes are in the filename, so it's just an easy case. */
+
+/*        It's possible that the entire filename is an environment */
+/*        variable. If it's not, then just return the input filename. */
+
+	getenv_(infil, outfil, infil_len, outfil_len);
+	if (s_cmp(outfil, " ", outfil_len, (ftnlen)1) == 0) {
+	    s_copy(outfil, infil, outfil_len, infil_len);
+	}
+    }
     chkout_("EXPFNM_1", (ftnlen)8);
     return 0;
 } /* expfnm_1__ */

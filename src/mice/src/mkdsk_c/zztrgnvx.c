@@ -413,7 +413,7 @@ static integer c_b7 = 100000000;
 /*        The fine voxel count increases linearly as a function */
 /*        of NP - NPLIM. The count at NP = MAXPLT is 2*MAXPLT. */
 
-	d__1 = (*np - 1e6) * -.22222222222222221 * 2;
+	d__1 = (*np - 1e6) * .64516129032258063 * 2;
 	*trgfin = i_dnnt(&c_b3) + i_dnnt(&d__1);
     } else if (*np > 1000) {
 

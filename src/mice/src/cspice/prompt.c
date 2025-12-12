@@ -465,13 +465,19 @@ static integer c__1 = 1;
 
 
 
-/*     The following code should be used in the following environments: */
-/*     VAX/FORTRAN, IBM-PC/Lahey Fortran, MacIntosh/Language Systems */
-/*     Fortran */
+
+/*     The code below should be used in the following environments: */
+
+/*     SUN/Fortran, */
+/*     HP/HP-Fortran, */
+/*     Silicon Graphics/Silicon Graphics Fortran, */
+/*     DEC Alpha-OSF/1--DEC Fortran, */
+/*     NeXT/Absoft Fortran */
+/*     PC Linux/Fort77 */
 
     ci__1.cierr = 1;
     ci__1.ciunit = 6;
-    ci__1.cifmt = "(1H ,A,$)";
+    ci__1.cifmt = "(A,$)";
     iostat = s_wsfe(&ci__1);
     if (iostat != 0) {
 	goto L100001;

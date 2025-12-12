@@ -8,12 +8,12 @@
 /* Table of constant values */
 
 static doublereal c_b17 = 1.;
-static integer c_b22 = 5000002;
-static integer c_b23 = 10000000;
+static integer c_b22 = 16000002;
+static integer c_b23 = 32000000;
 static integer c_b29 = 60000000;
-static integer c_b30 = 5000000;
-static integer c_b31 = 62500000;
-static integer c_b32 = 92600012;
+static integer c_b30 = 16000000;
+static integer c_b31 = 68000000;
+static integer c_b32 = 164100012;
 static integer c__3 = 3;
 static integer c_b38 = 100000000;
 
@@ -67,10 +67,10 @@ static integer c_b38 = 100000000;
     extern logical return_(void);
     static char aunits[255], dunits[255];
     static doublereal avplex, corpar[10], extent[6]	/* was [2][3] */, 
-	    spaixd[10], voxscl, vrtces[15000006]	/* was [3][5000002] */
-	    ;
-    static integer corsys, nvxptr, nvxtot, plates[30000000]	/* was [3][
-	    10000000] */, plttyp, spaixi[92600012], surfid, trgcor, trgfin, 
+	    spaixd[10], voxscl, vrtces[48000006]	/* was [3][16000002] 
+	    */;
+    static integer corsys, nvxptr, nvxtot, plates[96000000]	/* was [3][
+	    32000000] */, plttyp, spaixi[164100012], surfid, trgcor, trgfin, 
 	    vgrext[3];
     static logical makvpm;
     extern /* Subroutine */ int chkout_(char *, ftnlen), setmsg_(char *, 
@@ -899,7 +899,7 @@ static integer c_b38 = 100000000;
 	    }
 	    i__1 = nv;
 	    for (i__ = 1; i__ <= i__1; ++i__) {
-		vsclip_(&scale, &vrtces[(i__2 = i__ * 3 - 3) < 15000006 && 0 
+		vsclip_(&scale, &vrtces[(i__2 = i__ * 3 - 3) < 48000006 && 0 
 			<= i__2 ? i__2 : s_rnge("vrtces", i__2, "zzwseg02_", (
 			ftnlen)394)]);
 	    }

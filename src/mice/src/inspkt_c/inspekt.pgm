@@ -289,7 +289,7 @@
     s_copy(versn, "                  Inspekt --- Version 7.23", (ftnlen)80, (
 	    ftnlen)42);
     setlan_("ENGLISH", (ftnlen)7);
-    setedt_("edit", (ftnlen)4);
+    setedt_("emacs", (ftnlen)5);
     cmloop_(";", "Inspekt>", logfil, versn, (U_fp)nspint_, (U_fp)preprc_, (
 	    U_fp)inspkn_, (ftnlen)1, (ftnlen)8, (ftnlen)127, (ftnlen)80);
     byebye_("SUCCESS", (ftnlen)7);

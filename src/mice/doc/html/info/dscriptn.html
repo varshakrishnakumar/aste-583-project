@@ -82,7 +82,7 @@
 <H1> Introduction
 </H1><HR SIZE=3 NOSHADE><P><BR><BR><BR>
    This document describes the structure and contents of the latest version
-   of the NAIF mice Toolkit for PC computers using MICROSOFT WINDOWS
+   of the NAIF mice Toolkit for INTEL MAC computers using MAC OS-X
    operating system.
 <P>
  
@@ -98,7 +98,7 @@
 <H2> Version Information
 </H2><HR ALIGN="LEFT" WIDTH=50% ><P><BR><BR>
 <PRE>
-   Creation Date: Sat Jan  1 19:20:13 PST 2022
+   Creation Date: Sat Jan  1 19:19:34 PST 2022
    Version      : MICE.................V.N0067
 </PRE>
 <BR><BR>
@@ -106,7 +106,7 @@
 <p align="right"><a href="#top"><small>Top</small></a></p>
 <H1> Directory Structure and Contents
 </H1><HR SIZE=3 NOSHADE><P><BR><BR><BR>
-   The top level directory, mice, contains the file makeall.bat. This is a
+   The top level directory, mice, contains the file makeall.csh. This is a
    script that builds all of the object libraries and executables in the
    mice Toolkit.
 <P>
@@ -116,7 +116,7 @@
       |
       mice
          |
-         makeall.bat
+         makeall.csh
 </PRE>
    It may optionally contain a zero-size file named N????, e.g. N0067,
    indicating the generic SPICE Toolkit version on which this package is
@@ -296,27 +296,27 @@ products in this package.
          |
          exe
             |
-            brief.exe
-            chronos.exe
-            ckbrief.exe
-            commnt.exe
-            simple.exe
-            states.exe
-            subpt.exe
-            tictoc.exe
-            dskbrief.exe
-            dskexp.exe
-            frmdiff.exe
-            inspekt.exe
-            mkdsk.exe
-            mkspk.exe
-            msopck.exe
-            spacit.exe
-            spkdiff.exe
-            spkmerge.exe
-            tobin.exe
-            toxfr.exe
-            version.exe
+            brief
+            chronos
+            ckbrief
+            commnt
+            simple
+            states
+            subpt
+            tictoc
+            dskbrief
+            dskexp
+            frmdiff
+            inspekt
+            mkdsk
+            mkspk
+            msopck
+            spacit
+            spkdiff
+            spkmerge
+            tobin
+            toxfr
+            version
 </PRE>
 <BR><BR>
 <A NAME="INCLUDE"></A>
@@ -388,14 +388,10 @@ products in this package.
 <P>
  
 <PRE>
-   /c /O2 -D_COMPLEX_DEFINED -DMSDOS -DOMIT_BLANK_CC
-   -DNON_ANSI_STDIO
+   -m64 -c -ansi -O2 -fPIC -DNON_UNIX_STDIO
+   -Wno-shift-op-parentheses -Wno-logical-op-parentheses
+   -Wno-parentheses
 </PRE>
-   One routine, zzsecprt.c, is compiled without the /O2 optimization
-   option, because the MS Visual C++/C compiler is unable to process the
-   routine correctly when using this optimization feature.
-<P>
- 
    The libraries contained in this directory are listed below. Each library
    is discussed in more detail later in the section devoted to the SRC
    directory.
@@ -408,8 +404,8 @@ products in this package.
          |
          lib
             |
-            cspice.lib
-            csupport.lib
+            cspice.a
+            csupport.a
             mice.*
 </PRE>
 <BR><BR>
@@ -478,7 +474,7 @@ products in this package.
                brief.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="CHRONOS"></A>
@@ -505,7 +501,7 @@ products in this package.
                main.x
                chronos.pgm
                *.c
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="CKBRIEF"></A>
@@ -532,7 +528,7 @@ products in this package.
                main.x
                ckbrief.pgm
                *.c
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="COMMNT"></A>
@@ -560,7 +556,7 @@ products in this package.
                main.x
                commnt.pgm
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="COOKBOOK"></A>
@@ -589,7 +585,7 @@ products in this package.
                states.pgm
                subpt.pgm
                tictoc.pgm
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="DSKBRIEF"></A>
@@ -616,7 +612,7 @@ products in this package.
                dskbrief.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="DSKEXP"></A>
@@ -644,7 +640,7 @@ products in this package.
                dskexp.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="FRMDIFF"></A>
@@ -673,7 +669,7 @@ products in this package.
                frmdiff.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="INSPEKT"></A>
@@ -701,7 +697,7 @@ products in this package.
                inspekt.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="MKDSK"></A>
@@ -729,7 +725,7 @@ products in this package.
                mkdsk.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="MKSPK"></A>
@@ -757,7 +753,7 @@ products in this package.
                mkspk.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="MSOPCK"></A>
@@ -787,7 +783,7 @@ products in this package.
                msopck.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="SPACIT"></A>
@@ -817,7 +813,7 @@ products in this package.
                spacit.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="CSPICE"></A>
@@ -842,7 +838,7 @@ products in this package.
                |
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="SPKDIFF"></A>
@@ -871,7 +867,7 @@ products in this package.
                spkdiff.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="SPKMERGE"></A>
@@ -899,7 +895,7 @@ products in this package.
                spkmerge.pgm
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="CSUPPORT"></A>
@@ -913,8 +909,8 @@ products in this package.
    be deleted. Do not use them!
 <P>
  
-   This directory contains the CSUPPORT library source files and a batch
-   file to create the object library csupport.a.
+   This directory contains the CSUPPORT library source files and a script
+   to create the object library csupport.a.
 <P>
  
 <PRE>
@@ -928,7 +924,7 @@ products in this package.
                |
                *.c
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="TOBIN"></A>
@@ -955,7 +951,7 @@ products in this package.
                main.x
                tobin.pgm
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="TOXFR"></A>
@@ -982,7 +978,7 @@ products in this package.
                main.x
                toxfr.pgm
                *.h
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="VERSION"></A>
@@ -1008,7 +1004,7 @@ products in this package.
                |
                main.x
                version.pgm
-               mkprodct.bat
+               mkprodct.csh
 </PRE>
 <BR><BR>
 <A NAME="MICE"></A>

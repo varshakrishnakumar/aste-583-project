@@ -19,7 +19,7 @@ static integer c__1 = 1;
 {
     /* Initialized data */
 
-    static char editor[132] = "edit                                         "
+    static char editor[132] = "emacs                                        "
 	    "                                                                "
 	    "                       ";
     static logical first = TRUE_;

@@ -10,9 +10,11 @@
 {
     /* Initialized data */
 
-    static char savdev[128] = "SCREEN                                       "
+    static char savdev[255] = "SCREEN                                       "
 	    "                                                                "
-	    "                   ";
+	    "                                                                "
+	    "                                                                "
+	    "                  ";
 
     /* Builtin functions */
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
@@ -340,7 +342,7 @@
 
 /*     Executable Code: */
 
-    s_copy(savdev, device, (ftnlen)128, device_len);
+    s_copy(savdev, device, (ftnlen)255, device_len);
     return 0;
 /* $Procedure GETDEV ( Get Error Output Device Specification ) */
 
@@ -498,7 +500,7 @@ L_getdev:
 
 /*     Grab saved error output device specification: */
 
-    s_copy(device, savdev, device_len, (ftnlen)128);
+    s_copy(device, savdev, device_len, (ftnlen)255);
     return 0;
 } /* putdev_ */
 

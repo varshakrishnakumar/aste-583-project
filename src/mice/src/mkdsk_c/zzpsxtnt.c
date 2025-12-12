@@ -7,8 +7,8 @@
 
 /* Table of constant values */
 
-static integer c_b6 = 5000002;
-static integer c_b12 = 10000000;
+static integer c_b6 = 16000002;
+static integer c_b12 = 32000000;
 
 /* $Procedure    ZZPSXTNT ( MKDSK, compute plate set extents ) */
 /* Subroutine */ int zzpsxtnt_(integer *nv, doublereal *verts, integer *np, 
@@ -419,7 +419,7 @@ static integer c_b12 = 10000000;
 
 /*     Reject invalid plate and vertex counts. */
 
-    if (*nv < 3 || *nv > 5000002) {
+    if (*nv < 3 || *nv > 16000002) {
 	setmsg_("Vertex count NV = #; count must be in the range 3:#.", (
 		ftnlen)52);
 	errint_("#", nv, (ftnlen)1);
@@ -428,7 +428,7 @@ static integer c_b12 = 10000000;
 	chkout_("ZZPSXTNT", (ftnlen)8);
 	return 0;
     }
-    if (*np < 1 || *np > 10000000) {
+    if (*np < 1 || *np > 32000000) {
 	setmsg_("Plate count NP = #; count must be in the range 1:#.", (
 		ftnlen)51);
 	errint_("#", np, (ftnlen)1);

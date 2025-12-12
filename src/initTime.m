@@ -1,29 +1,34 @@
-function [ET0,LTM,LCM] = initTime()
-% This function initializes the ephemieris time for the initial detection,
-% the Lunar Targeting Maneuver, and the Lunar Correction Maneuver.
-
-% Add Mice Path
-addpath(genpath('mice\src\mice'));
-addpath(genpath('mice\lib'));
-addpath(genpath('mice\include'));
-addpath(genpath('mice\generic_kernels'));
-
-% Load DE440 Ephemeris
-cspice_furnsh('mice\generic_kernels\de440s.bsp');
-
-% Load Leapsecond Kernel
-cspice_furnsh('mice\generic_kernels\naif0012.tls.pc.txt');
-
-% Detection Date
-date_detect = '1-DEC-2025 00:00:00.00 UTC'; % start date in UTC
-ET0 = cspice_str2et(date_detect); % epoch time (seconds past J2000)
-
-% LTM Date
-date_LTM = '16-DEC-2025 00:00:00.00 UTC'; % start date in UTC
-LTM = cspice_str2et(date_LTM); % epoch time (seconds past J2000)
-
-% LCM Date
-date_LCM = '25-DEC-2025 00:00:00.00 UTC'; % start date in UTC
-LCM = cspice_str2et(date_LCM); % epoch time (seconds past J2000)
-
+function [ET0, LTM, LCM] = initTime()
+    persistent spiceLoaded
+    if isempty(spiceLoaded) || ~spiceLoaded
+        thisDir = fileparts(mfilename('fullpath'));
+        miceDir = fullfile(thisDir, 'mice');
+        addpath(genpath(fullfile(miceDir,'src','mice')));
+        addpath(genpath(fullfile(miceDir,'lib')));
+        addpath(genpath(fullfile(miceDir,'include')));
+        addpath(genpath(fullfile(miceDir,'generic_kernels')));
+        cspice_kclear;
+        kernDir = fullfile(miceDir,'generic_kernels');
+        lsk = "";
+        lskCandidates = ["naif0012.tls", "naif0012.tls.pc", "naif0012.tls.pc.txt"];
+        for k = lskCandidates
+            f = fullfile(kernDir, k);
+            if exist(f, 'file')
+                lsk = f; break;
+            end
+        end
+        if lsk == ""
+            error('initTime:MissingLSK', 'No leapseconds kernel found in %s', kernDir);
+        end
+        cspice_furnsh(char(lsk));
+        de = fullfile(kernDir, 'de440s.bsp');
+        if ~exist(de,'file')
+            error('initTime:MissingDE', 'Missing ephemeris kernel %s', de);
+        end
+        cspice_furnsh(de);
+        spiceLoaded = true;
+    end
+    ET0 = cspice_str2et('2025 DEC 01 00:00:00 UTC');
+    LTM = cspice_str2et('2025 DEC 16 00:00:00 UTC');
+    LCM = cspice_str2et('2025 DEC 25 00:00:00 UTC');
 end
